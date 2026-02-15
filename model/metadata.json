@@ -1,0 +1,9 @@
+{
+  "model_type": "Logistic Regression",
+  "accuracy": 0.75,
+  "num_features": 1000,
+  "classes": [
+    "negative",
+    "positive"
+  ]
+}
