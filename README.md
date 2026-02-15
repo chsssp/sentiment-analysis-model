@@ -62,7 +62,6 @@ sentiment-analysis-model/
 ├── predict.py              # Inference script
 ├── requirements.txt        # Python dependencies
 ├── README.md              # This file
-├── MODEL_CARD.md          # Hugging Face model card
 └── model/                 # Saved model files (generated)
     ├── sentiment_model.pkl
     ├── vectorizer.pkl
