@@ -1,6 +1,7 @@
 """
 Sentiment Analysis Model Training Script
-Text classification model for sentiment analysis
+A beginner-friendly text classification model for sentiment analysis
+NOW WITH 3 CLASSES: Positive, Neutral, Negative
 """
 
 import pandas as pd
@@ -14,8 +15,8 @@ import json
 import os
 
 def create_sample_data():
-    """Create a sample dataset for demonstration"""
-    # Expanded movie and product reviews dataset
+    """Create a sample dataset for demonstration with 3 classes"""
+    # Positive reviews
     positive_reviews = [
         "This movie was absolutely wonderful! I loved every minute of it.",
         "Amazing performance by the lead actor. Highly recommended!",
@@ -42,21 +43,6 @@ def create_sample_data():
         "So happy with this purchase!",
         "Amazing! Better than I imagined.",
         "Superb customer service and great product.",
-        "Top notch quality. Very impressed.",
-        "Excellent in every aspect.",
-        "This made my day! Love it.",
-        "Perfect gift. Everyone loved it.",
-        "Outstanding performance and reliability.",
-        "Beautifully crafted and functional.",
-        "I'm thrilled with this purchase.",
-        "Fantastic! Exceeded all expectations.",
-        "Best decision ever. Absolutely love it.",
-        "Remarkable quality and attention to detail.",
-        "Stunning! Exactly as pictured.",
-        "Flawless execution and great results.",
-        "Highly effective and easy to use.",
-        "Brilliant! Solves my problem perfectly.",
-        "Exceptional value and quality.",
     ]
     
     negative_reviews = [
@@ -85,38 +71,60 @@ def create_sample_data():
         "Horrible! Nothing like the pictures.",
         "Waste of time and money.",
         "Poor craftsmanship and materials.",
-        "Disappointed in every way.",
-        "Does not work as advertised.",
-        "Terrible design and functionality.",
-        "Not recommended. Save your money.",
-        "Very poor quality for the price.",
-        "Completely dissatisfied with this.",
-        "Worst purchase I've made.",
-        "Defective and poorly made.",
-        "Horrible quality. Fell apart quickly.",
-        "Not worth it. Very disappointing.",
-        "Terrible! Regret buying this.",
-        "Poor value and quality.",
-        "Cheaply constructed. Broke easily.",
-        "Awful. Nothing works right.",
-        "Very unhappy with this product.",
+    ]
+    
+    # NEW: Neutral reviews
+    neutral_reviews = [
+        "It's okay, nothing special but gets the job done.",
+        "Average quality, meets basic expectations.",
+        "Not bad, not great, just okay.",
+        "It works fine, nothing to complain about.",
+        "Acceptable product for the price.",
+        "Neither impressed nor disappointed.",
+        "Standard quality, as expected.",
+        "Decent, but there are better options.",
+        "It's fine, does what it's supposed to do.",
+        "Mediocre performance, could be better.",
+        "Nothing extraordinary, just average.",
+        "Satisfactory, but not exceptional.",
+        "It's alright, no strong feelings either way.",
+        "Reasonable product, no major issues.",
+        "Pretty standard, nothing stands out.",
+        "Moderate quality, acceptable.",
+        "It's okay for the price point.",
+        "Average experience overall.",
+        "Fair product, meets minimum requirements.",
+        "Neither good nor bad, just neutral.",
+        "Ordinary quality, nothing special.",
+        "It works, that's about it.",
+        "Adequate for basic needs.",
+        "No complaints, but nothing impressive.",
+        "Standard product, average performance.",
     ]
     
     data = {
-        'text': positive_reviews + negative_reviews,
-        'sentiment': ['positive'] * len(positive_reviews) + ['negative'] * len(negative_reviews)
+        'text': positive_reviews + negative_reviews + neutral_reviews,
+        'sentiment': (
+            ['positive'] * len(positive_reviews) + 
+            ['negative'] * len(negative_reviews) + 
+            ['neutral'] * len(neutral_reviews)
+        )
     }
     return pd.DataFrame(data)
 
 def train_sentiment_model():
     """Train the sentiment analysis model"""
     
-    print("Starting Sentiment Analysis Model Training\n")
+    print("Starting Sentiment Analysis Model Training (3-Class)")
+    print()
     
     # Load or create data
     print("Loading dataset...")
     df = create_sample_data()
-    print(f"Dataset size: {len(df)} samples\n")
+    print(f"Dataset size: {len(df)} samples")
+    print(f"Class distribution:")
+    print(df['sentiment'].value_counts())
+    print()
     
     # Split the data
     print("Splitting data into train and test sets...")
@@ -124,7 +132,8 @@ def train_sentiment_model():
         df['text'], 
         df['sentiment'], 
         test_size=0.2, 
-        random_state=42
+        random_state=42,
+        stratify=df['sentiment']  # Ensures balanced split
     )
     
     # Create TF-IDF vectorizer
@@ -134,8 +143,8 @@ def train_sentiment_model():
     X_test_tfidf = vectorizer.transform(X_test)
     
     # Train the model
-    print("Training Logistic Regression model...")
-    model = LogisticRegression(random_state=42, max_iter=1000)
+    print("Training Logistic Regression model (multi-class)...")
+    model = LogisticRegression(random_state=42, max_iter=1000, multi_class='multinomial')
     model.fit(X_train_tfidf, y_train)
     
     # Make predictions
@@ -157,7 +166,8 @@ def train_sentiment_model():
     
     # Save model metadata
     metadata = {
-        'model_type': 'Logistic Regression',
+        'model_type': 'Logistic Regression (Multi-class)',
+        'num_classes': 3,
         'accuracy': float(accuracy),
         'num_features': vectorizer.max_features,
         'classes': model.classes_.tolist()
@@ -166,18 +176,22 @@ def train_sentiment_model():
     with open('model/metadata.json', 'w') as f:
         json.dump(metadata, f, indent=2)
     
-    print("Model training complete! Files saved in 'model/' directory\n")
+    print("✨ Model training complete! Files saved in 'model/' directory\n")
     
     return model, vectorizer, metadata
 
 def test_model(model, vectorizer):
     """Test the model with some examples"""
-    print("Testing model with sample predictions:\n")
+    print("🧪 Testing model with sample predictions:\n")
     
     test_texts = [
         "This is an amazing product, I love it!",
         "Terrible experience, very disappointed.",
-        "Pretty good, would recommend to others."
+        "Pretty good, would recommend to others.",
+        "It's okay, nothing special.",
+        "Absolutely fantastic! Best ever!",
+        "Horrible, complete waste of money.",
+        "Average quality, does the job."
     ]
     
     for text in test_texts:
@@ -195,5 +209,4 @@ if __name__ == "__main__":
     
     # Test the model
     test_model(model, vectorizer)
-    
     

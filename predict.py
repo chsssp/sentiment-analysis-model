@@ -1,6 +1,7 @@
 """
 Sentiment Analysis Inference Script
 Load the trained model and make predictions on new text
+NOW SUPPORTS 3 CLASSES: Positive, Neutral, Negative
 """
 
 import joblib
@@ -39,26 +40,40 @@ class SentimentAnalyzer:
 
 def main():
     """Demo the sentiment analyzer"""
-    print("🎭 Sentiment Analysis Demo\n")
+    print("Sentiment Analysis Demo (3-Class Model)\n")
     
     # Load the analyzer
     analyzer = SentimentAnalyzer()
     
-    # Test examples
+    # Test examples - covering all 3 classes
     examples = [
         "I absolutely loved this product! Best purchase ever!",
         "Horrible experience, completely unsatisfied.",
         "It's okay, nothing special but gets the job done.",
         "Outstanding quality and excellent customer service!",
-        "Waste of money, very disappointing."
+        "Waste of money, very disappointing.",
+        "Average quality, does what it's supposed to.",
+        "This is neither good nor bad, just normal.",
+        "Fantastic! Exceeded all expectations!",
+        "Terrible! Complete waste of money!",
+        "Decent product, no complaints."
     ]
     
     print("Analyzing sample texts:\n")
-    for example in examples:
+    for i, example in enumerate(examples, 1):
         result = analyzer.predict(example)
-        print(f"📝 Text: {result['text']}")
-        print(f"😊 Sentiment: {result['sentiment'].upper()}")
-        print(f"📊 Confidence: {result['confidence']:.2%}")
+        
+        # Get emoji based on sentiment (3 classes)
+        if result['sentiment'] == 'positive':
+            emoji = "😊"
+        elif result['sentiment'] == 'negative':
+            emoji = "😞"
+        else:  # neutral
+            emoji = "😐"
+        
+        print(f"{i}. Text: {result['text']}")
+        print(f"   {emoji} Sentiment: {result['sentiment'].upper()}")
+        print(f"   Confidence: {result['confidence']:.2%}")
         print(f"   Probabilities: {result['probabilities']}")
         print()
 
