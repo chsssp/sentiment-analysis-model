@@ -120,5 +120,9 @@ Built with:
 
 ## Contact
 
-For questions or feedback, please open an issue on GitHub.
+
+
+Enhancements made:
+
+1) Added one more sentiment: Neutral
 
